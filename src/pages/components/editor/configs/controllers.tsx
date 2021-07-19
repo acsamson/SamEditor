@@ -2,7 +2,7 @@
  * @Description:
  * @Author: acsamson
  * @Date: 2021-07-20 03:30:13
- * @LastEditTime: 2021-07-20 04:56:39
+ * @LastEditTime: 2021-07-20 05:01:54
  * @LastEditors: acsamson@foxmail.com
  * @FilePath: /SamEditor/src/pages/components/editor/configs/controllers.tsx
  */
@@ -56,4 +56,6 @@ export const TODO_STYLES = [
   { label: '文稿样式', key: 'unstyled', style: 'UNSTYLED' },
   { label: '边框', key: 'unstyled', style: 'UNSTYLED' },
   { label: '媒体', key: 'unstyled', style: 'UNSTYLED' },
+  { label: '导入', key: 'unstyled', style: 'UNSTYLED' },
+  { label: '导出', key: 'unstyled', style: 'UNSTYLED' },
 ];
