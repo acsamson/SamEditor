@@ -2,7 +2,7 @@
  * @Description:
  * @Author: acsamson
  * @Date: 2021-07-20 03:30:13
- * @LastEditTime: 2021-07-20 05:01:54
+ * @LastEditTime: 2021-07-20 05:02:56
  * @LastEditors: acsamson@foxmail.com
  * @FilePath: /SamEditor/src/pages/components/editor/configs/controllers.tsx
  */
@@ -36,6 +36,8 @@ export const INLINE_STYLES = [
 
 export const TODO_STYLES = [
   { label: '布局', key: 'unstyled', style: 'UNSTYLED' },
+  { label: '插入公式', key: 'unstyled', style: 'UNSTYLED' },
+  { label: '批注', key: 'unstyled', style: 'UNSTYLED' },
   { label: '清除选择样式', key: 'unstyled', style: 'UNSTYLED' },
   { label: '格式刷', key: 'unstyled', style: 'UNSTYLED' },
   { label: '字号', key: 'unstyled', style: 'UNSTYLED' },
