@@ -3,7 +3,7 @@
     "editor.tabSize": 4,
     "editor.formatOnPaste": true,
     "editor.formatOnSave": true,
-    "eggHelper.serverPort": 35684,
+    "eggHelper.serverPort": 36370,
     "workbench.colorCustomizations": {
         "activityBar.activeBackground": "#65c89b",
         "activityBar.activeBorder": "#945bc4",

@@ -1,114 +1,127 @@
-/*
- * @Description:
- * @Author: acsamson
- * @Date: 2021-06-24 02:22:42
- * @LastEditTime: 2021-07-09 03:16:49
- * @LastEditors: acsamson@foxmail.com
- * @FilePath: /SamEditor/src/pages/components/editor/index.tsx
- */
-import React, { useState, useEffect } from 'react';
-import { message } from 'antd';
-// ================================= 编辑器相关
-import { EditorState, convertFromRaw } from 'draft-js';
-import Editor from '@draft-js-plugins/editor';
-import 'draft-js/dist/Draft.css';
-import utils from './utils';
-import _isEqual from 'lodash/isEqual';
-import './index.less';
-import customStyleMap from './data/customStyleMap';
-import plugins from '../../configs/plugins';
-import { connect } from 'dva';
-import { initialState } from './data/initialState';
-import cmdConfigs from './configs/cmds';
-import styles from './index.less';
-import './editor.less';
-const CharCounter = plugins.counterPlugin.CharCounter;
-const _plugins = Object.values(plugins);
-interface Props {
-  cmd: any;
-  onChange: Function;
-  dispatch: Function;
-}
-function EditorContainer(props: Props) {
-  const editor = React.useRef<any>(null);
-  const { dispatch, cmd } = props;
-  // const [editorState, setEditorState] = useState(EditorState.createEmpty());
-  // const [editorState, setEditorState] = useState(createEditorStateWithText('大萨达所大所大所大所'));
-  const [editorState, setEditorState] = useState(EditorState.createWithContent(convertFromRaw(initialState)));
-  const [oldEditorState, setoldEditorState] = useState(editorState);
+import React, { Component } from 'react';
+import { Editor, EditorState, RichUtils } from 'draft-js';
+import { Tag } from 'antd';
+import Immutable from 'immutable';
+import "draft-js/dist/Draft.css";
+import styles from './index.less'
+import StyleButton from './components/StyleButton';
+import BlockStyleControls from './controllers/BlockStyleControls';
+import InlineStyleControls from './controllers/InlineStyleControls';
+import { cmdStyleMap } from './data/cmdStyleMap';
 
-  const onChange = (((val: any) => {
-    const _currentContent = val.getCurrentContent();
-    const _selectState = val.getSelection();
-    const _anchorKey = _selectState.getAnchorKey();
-    const _start = _selectState.getStartOffset();
-    const _end = _selectState.getEndOffset();
-    const _currentContentBlock = _currentContent.getBlockForKey(_anchorKey);
-    const _selectedText = _currentContentBlock.getText().slice(_start, _end);
-    props.onChange && props.onChange(val);
-    dispatch({
-      type: 'SamEditor/setEditorState',
-      editorState: val
-    });
-    setEditorState(val)
-  }));
-  useEffect(() => {
-    if (!_isEqual(oldEditorState, editorState) && props.cmd && Object.keys(props.cmd).length) {
-      message.success(JSON.stringify(props.cmd));
-      const dataInner = utils.editorStateChange(editorState, props.cmd);
-      if (dataInner) {
-        setoldEditorState(dataInner);
-        onChange(dataInner);
-      }
-    }
-  }, [editorState, oldEditorState, onChange, props]);
-  useEffect(() => {
-    if (props.cmd.toggleInlineStyle && props.cmd.toggleInlineStyle === 'REMOVESTYLES') {
-      cmdConfigs.clear(editorState);
-    }
-  }, [editorState, props.cmd])
-  const editorProps = {
-    // =============================== Basics 必选参数
-    ref: editor,
-    editorState,
-    onChange,
-    // =============================== Presentation (Optional) 介绍(可选)
-    placeholder: "Write something!",
-    // =============================== Behavior (Optional) 行为(可选)
-    // 改变editor
-    // onTab: props.onTab,
-    // 聚焦
-    // onFocus: props.onFocus,
-    // 离开焦点
-    // onBlur: props.onBlur,
-    // 处理key控制信息, 例如bold加粗
-    // handleKeyCommand,
-    // handleReturn: props.handleReturn,
-    // handleBeforeInput: props.handleBeforeInput,
-    // handleDrop: props.handleDrop,
-    // handleDroppedFiles: props.handleDroppedFiles,
-    // handlePastedText: props.handlePastedText,
-    // handlePastedFiles: props.handlePastedFiles,
-    autoCorrect: false, // 可选，否打开自动修正功能
-    spellCheck: false // 可选，是否打开拼写检查
+class MyEditor extends Component {
+  constructor() {
+    super();
+    this.state = {
+      editorState: EditorState.createEmpty()
+    };
+  }
+  _onChange(editorState) {
+    this.setState({ editorState });
   }
 
-  return (
-    <div className={styles.editor} onClick={e => {
-      editor.current.focus();
-    }}>
-      <h1><strong>EditorContent</strong></h1>
-      <div className={styles.content}>
-        <Editor
-          {...editorProps}
-          customStyleMap={customStyleMap}
-          plugins={_plugins}
+  _handleKeyCommand(command) {
+    const { editorState } = this.state;
+    const newState = RichUtils.handleKeyCommand(editorState, command);
+    if (newState) {
+      this._onChange(newState);
+      return true;
+    }
+    return false;
+  }
+
+  _onTab(e) {
+    const maxDepth = 4;
+    this._onChange(RichUtils.onTab(e, this.state.editorState, maxDepth));
+  }
+
+  _toggleBlockType(blockType) {
+    if (blockType === 'remove-block-style') {
+      this._onChange(
+        // blockType如果已经存在就会被设置为unstyled
+        RichUtils.tryToRemoveBlockStyle(this.state.editorState)
+      );
+    } else {
+      this._onChange(
+        // blockType如果已经存在就会被设置为unstyled
+        RichUtils.toggleBlockType(this.state.editorState, blockType)
+      );
+    }
+  }
+
+  _toggleInlineStyle(inlineStyle) {
+    this._onChange(
+      RichUtils.toggleInlineStyle(
+        this.state.editorState,
+        inlineStyle
+      )
+    );
+  }
+
+  _getBlockStyle(block) {
+    switch (block.getType()) {
+      case 'blockquote': return styles['RichEditor-blockquote'];
+      default: return null;
+    }
+  }
+  render() {
+    let { editorState } = this.state;
+    let className = styles['RichEditor-editor'];
+    // 如果没有内容了就需要新建内容
+    if (editorState && editorState.getCurrentContent) {
+      var contentState = editorState.getCurrentContent();
+      if (!contentState.hasText()) {
+        if (contentState.getBlockMap().first().getType() !== 'unstyled') {
+          className += ' ' + styles['RichEditor-hidePlaceholder'];
+        }
+      }
+    } else {
+      editorState = EditorState.createEmpty()
+    }
+
+    return (
+      <div className={styles["RichEditor-root"]}>
+        <h1>可用的编辑区域(供测试</h1>
+        <button onClick={e => { this._onChange(EditorState.undo(this.state.editorState)) }}>undo</button>
+        <button onClick={e => { this._onChange(EditorState.redo(this.state.editorState)) }}>Redo</button>
+        <br />
+        <Tag color="pink">快级样式</Tag>
+        <BlockStyleControls
+          editorState={editorState}
+          onToggle={this._toggleBlockType.bind(this)}
         />
+        <Tag color="blue">选择行内样式</Tag>
+        <InlineStyleControls
+          editorState={editorState}
+          onToggle={this._toggleInlineStyle.bind(this)}
+        />
+        <div className={className} onClick={() => this.refs.editor.focus()}>
+          <Editor
+            // 获取当前行内样式的类型, 比如block.getType() === 'blockquote' 返回样式
+            blockStyleFn={this._getBlockStyle.bind(this)}
+            // 自定义触发命令的样式
+            customStyleMap={cmdStyleMap}
+            // 编辑器实例
+            editorState={editorState}
+            // 热键控制
+            handleKeyCommand={this._handleKeyCommand.bind(this)}
+            // 当改变的时候, 参数为实例
+            onChange={this._onChange.bind(this)}
+            //
+            onTab={this._onTab.bind(this)}
+            // 默认值
+            placeholder="Tell a story..."
+            // 当聚焦的时候触发事件
+            onFocus={() => { console.log('focus') }}
+            // 引出实例
+            ref='editor'
+            // 开启拼写检查
+            spellCheck={false}
+          />
+        </div>
       </div>
-      <div className={styles.wordsCount}>字数统计:<CharCounter limit={200} /></div>
-    </div>
-  )
+    );
+  }
 }
-export default connect(({ SamEditor }) => ({
-  cmd: SamEditor.cmd
-}))(EditorContainer);
+
+export default MyEditor;

@@ -2,15 +2,15 @@
  * @Description:
  * @Author: acsamson
  * @Date: 2021-06-24 02:21:37
- * @LastEditTime: 2021-07-09 02:25:12
+ * @LastEditTime: 2021-07-20 02:34:40
  * @LastEditors: acsamson@foxmail.com
  * @FilePath: /SamEditor/src/pages/components/header/index.tsx
  */
 import React, { useMemo, useState, useEffect } from 'react';
 import switchProps from '../../configs/props';
 import { v4 as uuidv4 } from 'uuid';
-import { Button, Tooltip, Tag, Divider, Tabs, Select } from 'antd';
-import language from '../language';
+import { Button, Tooltip, Tag, Divider, Tabs, Select, message } from 'antd';
+import language from '../../language';
 import _controllers from './data/controllers';
 import styles from './index.less';
 import { CharacterMetadata } from 'draft-js';
@@ -34,17 +34,15 @@ function Header(props: any,) {
   }, [controls])
   const [cmd, setcmd] = useState({});
   const _onChange = (val: any) => {
+    message.info(`点击触发了功能: ${val.command}`, 5);
     setcmd({ toggleInlineStyle: val.command.toString().toUpperCase() });
   };
   useEffect(() => {
-    dispatch({
-      type: 'SamEditor/setCmd',
-      cmd
-    });
+    dispatch({ type: 'SamEditor/setCmd', cmd });
   }, [cmd, dispatch]);
   const getContorllerContent = (item: any) => {
+    // 下拉框类型
     if (item.type === 'select') {
-      console.log(222);
       return <Select style={{ width: '100px' }}
         defaultValue={item.text}
         onChange={e => {

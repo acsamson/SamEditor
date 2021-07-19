@@ -2,7 +2,7 @@
  * @Description:
  * @Author: acsamson
  * @Date: 2021-06-24 00:42:03
- * @LastEditTime: 2021-07-09 02:42:35
+ * @LastEditTime: 2021-07-20 04:39:27
  * @LastEditors: acsamson@foxmail.com
  * @FilePath: /SamEditor/src/pages/index.tsx
  */
@@ -19,9 +19,9 @@ interface Props {
 function SamEditor(props: Props) {
   return (
     <div>
-      <Description data={{ cmd: props.cmd, editorState: props.editorState }} />
-      <Header />
       <Editor />
+      <Header />
+      <Description data={{ cmd: props.cmd, editorState: props.editorState }} />
     </div>
   )
 }
