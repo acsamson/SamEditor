@@ -7,7 +7,10 @@ import styles from './index.less'
 import StyleButton from './components/StyleButton';
 import BlockStyleControls from './controllers/BlockStyleControls';
 import InlineStyleControls from './controllers/InlineStyleControls';
+import { TODO_STYLES } from './configs/controllers';
 import { cmdStyleMap } from './data/cmdStyleMap';
+import { BiCheck, BiX } from 'react-icons/bi';
+
 
 class MyEditor extends Component {
   constructor() {
@@ -81,10 +84,11 @@ class MyEditor extends Component {
 
     return (
       <div className={styles["RichEditor-root"]}>
-        <h1>可用的编辑区域(供测试</h1>
-        <button onClick={e => { this._onChange(EditorState.undo(this.state.editorState)) }}>undo</button>
-        <button onClick={e => { this._onChange(EditorState.redo(this.state.editorState)) }}>Redo</button>
+        <h1><strong>Tools</strong><span className={styles.desc}>（当前进度5%, 打钩✅代表已完成, 打叉❌代表未完成）</span></h1>
+        <button onClick={e => { this._onChange(EditorState.undo(this.state.editorState)) }}>撤销undo</button>
+        <button onClick={e => { this._onChange(EditorState.redo(this.state.editorState)) }}>重做Redo</button>
         <br />
+        <span style={{ color: 'green', fontSize: '32px' }}><BiCheck /></span>
         <Tag color="pink">快级样式</Tag>
         <BlockStyleControls
           editorState={editorState}
@@ -95,6 +99,15 @@ class MyEditor extends Component {
           editorState={editorState}
           onToggle={this._toggleInlineStyle.bind(this)}
         />
+        <span style={{ color: 'red', fontSize: '32px' }}><BiX /></span>
+        <Tag color="orange">待完成TODO样式</Tag>
+        <div>
+          {
+            TODO_STYLES.map(val => {
+              return <span className={styles.todoText}>{val.label}</span>
+            })
+          }
+        </div>
         <div className={className} onClick={() => this.refs.editor.focus()}>
           <Editor
             // 获取当前行内样式的类型, 比如block.getType() === 'blockquote' 返回样式
