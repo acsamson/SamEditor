@@ -35,6 +35,10 @@ export const INLINE_STYLES = [
 ];
 
 export const TODO_STYLES = [
+  { label: '表格', key: 'unstyled', style: 'UNSTYLED' },
+  { label: '图片', key: 'unstyled', style: 'UNSTYLED' },
+  { label: '手绘图层', key: 'unstyled', style: 'UNSTYLED' },
+  { label: '思惟导图', key: 'unstyled', style: 'UNSTYLED' },
   { label: '布局', key: 'unstyled', style: 'UNSTYLED' },
   { label: '插入公式', key: 'unstyled', style: 'UNSTYLED' },
   { label: '批注', key: 'unstyled', style: 'UNSTYLED' },
