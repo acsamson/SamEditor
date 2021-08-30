@@ -84,7 +84,7 @@ class MyEditor extends Component {
 
     return (
       <div className={styles["RichEditor-root"]}>
-        <h1><strong>Tools</strong><span className={styles.desc}>（当前进度5%, 打钩✅代表已完成, 打叉❌代表未完成）</span></h1>
+        <h1><strong>Tools</strong><span className={styles.desc}>（打钩✅代表已完成, 打叉❌代表未完成）</span></h1>
         <button onClick={e => { this._onChange(EditorState.undo(this.state.editorState)) }}>撤销undo</button>
         <button onClick={e => { this._onChange(EditorState.redo(this.state.editorState)) }}>重做Redo</button>
         <br />
